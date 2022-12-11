@@ -95,7 +95,7 @@ public class CourseRepository implements CrudRepository<Course, String> {
 
     @Override
     public void deleteById(String uuid) {
-        String sql = "DELETE * FROM course WHERE uuid LIKE ?";
+        String sql = "DELETE FROM course WHERE uuid LIKE ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, uuid);
         } catch (SQLException e) {

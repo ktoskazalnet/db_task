@@ -1,5 +1,13 @@
 package org.ktoskazalnet;
 
+import org.ktoskazalnet.mapper.CourseMapper;
+import org.ktoskazalnet.mapper.UserMapper;
+import org.ktoskazalnet.model.api.CourseDTO;
+import org.ktoskazalnet.repository.CourseRepository;
+import org.ktoskazalnet.repository.UserRepository;
+import org.ktoskazalnet.service.CourseService;
+import org.ktoskazalnet.service.UserService;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -13,6 +21,20 @@ public class App {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/study_db?user=postgres&password=psql";
 
     public static void main( String[] args ) {
+        initDb();
+
+        CourseMapper courseMapper = new CourseMapper();
+        CourseRepository courseRepository = new CourseRepository();
+        CourseService courseService = new CourseService(courseMapper, courseRepository);
+
+        UserMapper userMapper = new UserMapper();
+        UserRepository userRepository = new UserRepository(courseRepository);
+        UserService userService = new UserService(courseService, userMapper, userRepository);
+
+        CourseDTO courseDTO = CourseDTO.builder()
+                .name("Математика")
+                .build();
+
 
     }
 
@@ -33,7 +55,7 @@ public class App {
                     "course TEXT," +
                     "PRIMARY KEY (id)," +
                     "FOREIGN KEY (course)" +
-                    "REFERENCES public.course (name)" +
+                    "REFERENCES public.course (uuid)" +
                     ");";
 
             statement.execute(sql);
