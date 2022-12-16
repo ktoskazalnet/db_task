@@ -2,25 +2,24 @@ package org.ktoskazalnet;
 
 import org.ktoskazalnet.mapper.CourseMapper;
 import org.ktoskazalnet.mapper.UserMapper;
-import org.ktoskazalnet.model.api.CourseDTO;
+import org.ktoskazalnet.model.api.ApplyUserToCourse;
+import org.ktoskazalnet.model.api.CreateCourseRq;
+import org.ktoskazalnet.model.api.CreateUserRq;
+import org.ktoskazalnet.model.entity.Course;
+import org.ktoskazalnet.model.entity.User;
 import org.ktoskazalnet.repository.CourseRepository;
 import org.ktoskazalnet.repository.UserRepository;
 import org.ktoskazalnet.service.CourseService;
 import org.ktoskazalnet.service.UserService;
+import org.ktoskazalnet.util.DbConnection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Hello world!
- *
- */
 public class App {
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/study_db?user=postgres&password=psql";
 
     public static void main( String[] args ) {
+
         initDb();
 
         CourseMapper courseMapper = new CourseMapper();
@@ -28,38 +27,41 @@ public class App {
         CourseService courseService = new CourseService(courseMapper, courseRepository);
 
         UserMapper userMapper = new UserMapper();
-        UserRepository userRepository = new UserRepository(courseRepository);
+        UserRepository userRepository = new UserRepository();
         UserService userService = new UserService(courseService, userMapper, userRepository);
 
-        CourseDTO courseDTO = CourseDTO.builder()
-                .name("Математика")
-                .build();
+        userService.removeFromCourse(ApplyUserToCourse.builder()
+                        .id(3)
+                        .courseUuid("aaaa4")
+                        .build());
 
 
     }
 
     private static void initDb() {
-        try (Connection connection = DriverManager.getConnection(DB_URL);
+        try (var connection = DbConnection.getConnection();
              Statement statement = connection.createStatement()) {
 
-            String sql = "CREATE TABLE IF NOT EXISTS public.course (" +
+            var createCourse = "CREATE TABLE IF NOT EXISTS course (" +
                     "uuid TEXT NOT NULL, " +
                     "name TEXT NOT NULL," +
-                    "PRIMARY KEY (name)" +
+                    "PRIMARY KEY (uuid)" +
                     ")";
 
-            String sql2 = "CREATE TABLE IF NOT EXISTS public.users (" +
+            var createUsers = "CREATE TABLE IF NOT EXISTS users (" +
                     "id SERIAL," +
                     "name TEXT NOT NULL," +
                     "age INTEGER NOT NULL," +
-                    "course TEXT," +
+                    "course_uuid TEXT," +
                     "PRIMARY KEY (id)," +
-                    "FOREIGN KEY (course)" +
-                    "REFERENCES public.course (uuid)" +
+                    "FOREIGN KEY (course_uuid)" +
+                    "REFERENCES course (uuid)" +
                     ");";
 
-            statement.execute(sql);
-            statement.execute(sql2);
+            statement.execute(createCourse);
+            statement.execute(createUsers);
+
+            connection.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

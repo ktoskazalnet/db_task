@@ -1,30 +1,30 @@
 package org.ktoskazalnet.service;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.ktoskazalnet.mapper.CourseMapper;
 import org.ktoskazalnet.repository.CourseRepository;
-import org.ktoskazalnet.model.api.CourseDTO;
+import org.ktoskazalnet.model.api.CreateCourseRq;
 import org.ktoskazalnet.model.entity.Course;
 import org.ktoskazalnet.exception.CourseNotFoundException;
 
 import java.util.List;
 
-@Data
+@RequiredArgsConstructor
 public class CourseService {
     private final CourseMapper courseMapper;
     private final CourseRepository courseRepository;
 
-
-    public Course save(CourseDTO courseDTO) {
-        return courseRepository.save(courseMapper.toCourse(courseDTO));
+    public Course save(final CreateCourseRq createCourseRq) {
+        var entity = courseMapper.toCourse(createCourseRq);
+        return courseRepository.save(entity);
     }
 
-    public Course findById(String uuid) {
+    public Course findById(final String uuid) {
         return courseRepository.findById(uuid)
                 .orElseThrow(() -> new CourseNotFoundException("Course with uuid: " + uuid + " not found."));
     }
 
-    public boolean existsById(String uuid) {
+    public boolean existsById(final String uuid) {
         return courseRepository.existsById(uuid);
     }
 
@@ -32,7 +32,7 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    public void deleteById(String uuid) {
+    public void deleteById(final String uuid) {
         if (courseRepository.existsById(uuid)) {
             courseRepository.deleteById(uuid);
             System.out.println("Course successfully deleted.");
@@ -41,10 +41,7 @@ public class CourseService {
         }
     }
 
-    public void delete(CourseDTO courseDTO) {
-        courseRepository.delete(courseMapper.toCourse(courseDTO));
+    public void delete(Course course) {
+        courseRepository.delete(course);
     }
-
-
-
 }

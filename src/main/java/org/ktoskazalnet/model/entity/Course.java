@@ -2,6 +2,8 @@ package org.ktoskazalnet.model.entity;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -11,6 +13,7 @@ import lombok.*;
 public class Course {
     private String name;
     private String uuid;
+    private List<User> userList;
 
     @Override
     public boolean equals(Object o) {

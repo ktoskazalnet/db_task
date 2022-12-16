@@ -1,15 +1,13 @@
 package org.ktoskazalnet.mapper;
 
 import org.ktoskazalnet.model.entity.User;
-import org.ktoskazalnet.model.api.UserDTO;
-import org.ktoskazalnet.model.entity.Course;
+import org.ktoskazalnet.model.api.CreateUserRq;
 
 public class UserMapper {
-    public User toUser(UserDTO userDTO, Course course) {
+    public User toUser(CreateUserRq createUserRq) {
         return User.builder()
-                .course(course)
-                .name(userDTO.getName())
-                .age(userDTO.getAge())
+                .name(createUserRq.getName())
+                .age(createUserRq.getAge())
                 .build();
     }
 }
